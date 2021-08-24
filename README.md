@@ -25,7 +25,39 @@ to get around these problems we need to copy the contents of one list into anoth
  - `sorted(iterable, key=None, reverse=False)` sorts `iterable`, `key` and `reverse` are optional named parameters, if we need to specify `reverse`we would have to call `sorted` like this `sorted(list, reverse=true)`
 	 - `key` is a function that is applied to the elements one by one during sorting that transforms elements in a way without affecting the output, let's take a list of strings as an example we can pass `key=len` so that our sort will be applied on the lengths of each string instead of the strings themselves
 	 - `reverse`if True, the list is sorted in reverse order *(descending for integers)*
-### packages
+### Comparison operators
+we can use comparison operators on objects of the same type or compatible types such as bools, integers and floats, strings and integers won't work
+also note that `==` and `!=` operators work on different datatypes but return False and True respectively in most cases
+in python Boolean operators are `and`, `or` and `not`
+### Control structures
+
+
+    if condition:                     while condition :
+	    expression                    	expression
+    elif condition:
+	    expression                    for var in seq :
+    else :                            	expression
+	    expression                    
+#### for loop
+ - to iterate over a list with the index value we can use `for index, var in enumerate(seq)`
+ - you can also use the `,` separated variables to access elements of an array of arrays where `var1, var2` would correspond to `var1=element[0]` and `var2=element[1]`
+ - to iterate over a dictionary we use `for key, value in dict.items():`
+ - to iterate over a 2d numpy array we could use `for elem in 2d_array:` but the value of `elem` would contain 1d arrays, in order to iterate over the elements of a nd-array element by element we could use the following `for elem in np.nditer(nd_array)`
+ - to iterate over a Pandas *DataFrame* simply calling `for elem in dataFrame` would result in elem iterating over just the column name
+ - the proper way is to call `for label, row in dataFrame.iterrows():` where `label` contains the row-label and `row` contains a *Series* of the row.
+ in order to create a new column based on the value of each row we have to assign `dataFrame[label,'new_col_name']='new_value'`
+ but using a for loop is inefficient. We could use `dataFrame['new_col_name'] = dataFrame.apply(function)` where `function` takes a row as a parameter and returns the desired value to add, we can also use `dataFrame['col'].apply` to user a single column value instead of a whole row
+
+### Dictionaries
+
+    dict = {key: value}
+
+ - `dict.keys()` returns a list of the keys contained in the dictionary
+ - `dict[key]` to access the value corresponding to the key
+ - `key in dict` returns true if key is in the dictionary
+ - `del(dict[key])` deletes the key from the dictionary 
+
+### Packages
 `ìmport math as mt` import package `math` under the alias `mt`
 `from math import pi as pie` import `pi` from `math` under the alias `pie` *(specifying an alias is optional in both cases)*
 ### NumPy
@@ -54,5 +86,68 @@ this coverts `list` into a numpy array called `np_array`
 	 you can add nan prefix to all these function names so that they ignore array elements that can't be converted to a number `nanstd` for example
 	 
  - `np.corrcoef(x,y)` returns the [correlation coefficient](https://www.investopedia.com/ask/answers/032515/what-does-it-mean-if-correlation-coefficient-positive-negative-or-zero.asp) of the dataset, simmilarly `np.cov` is used to calculate the [covariance](https://www.investopedia.com/terms/c/covariance.asp) 
+ - `np.logical_and`, `np.logical_or` and `np.logical_not` can be used to perform element wise Boolean operations on two bool arrays
+### Matplotlib
+
+> matplotlib. pyplot is a collection of functions that make matplotlib
+> work like MATLAB
+
+in order to use this package we need to import it like so
+
+    import matplotlib.pyplot as plt
+
+ - `plt.plot(dataset1, dataset2)` to prepare for a plot line graph that uses dataset1 as x-axis and dataset2 as y-axis
+ we then have to call `plt.show()` in order to show the graph
+ - there are other types of graphs that are used simmilar to plot lines such as scatter
+ - we can call `plt.xscale('log')` before `plt.show()` to display the x-axis (resp y-axis) on a logarithmic scale. Other graph configurations are available
+ - if we have more than one graph we need to call `plt.clf()` after `plt.show()` in order to reset the configurations of the previous graph
+ ##### other types of graphs
+ - `plt.hist(dataset, bins=10)` is used to plot histograms, `bins` specify the number to divide the interval by, the default value is 10
+ - `plt.scatter(dataset1, dataset2, s=None, c=None, alpha=1)` build a scatter graph
+	 - `s` is assigned a list that controls the size of each dot in the graph
+	 - `c` is a list of colors that controls the color of each dot in the graph
+	 - `alpha` is the alpha of each dot (value from 0 to 1)
+##### graph customizations
+ - `plt.xlabel(label)` add a label on the x-axis (resp y-axis)
+ - `plt.title(title)` add a title to the graph
+ - `plt.xticks(tick_val, tick_lab)` customize ticks of the x-axis, `tick_val` and `tick_lab` are lists containing the values of ticks and the labels of each tick respectively
+ - `plt.text(x,y,text)` shows text on the graph on the point `(x,y)`
+ - `plt.grid(True)` enables grid
+
+### Pandas
+
+> The DataFrame is one of Pandas' most important data structures. It's
+> basically a way to store tabular data where you can label the rows and
+> the columns.
+
+ 
+
+    import pandas as pd
+
+
+
+One way to build a *DataFrame* is from a dictionary where the keys represent column names and the values are lists of the corresponding data
+
+    dict = {'cities':[...],'population':[...]}
+    dataFrame = pd.DataFrame(dict)
+
+  by default *DataFrame* labels are indexed 0, 1, 2 ... and so on, we can change this by passing a list of labels to the `dataFrame.index = labels` property
+  
+  We can also build a *DataFrame* from a CSV (comma seperated values) file like so
+
+    dataFrame = pd.read_csv('file-path')
+if the file contains row labels we need to tell this function what's the index of that column, if it's the first column we set `index_col` to `0`
+
+    dataFrame = pd.read_csv('file-path', index_col = 0)
+
+ - to access data from a *DataFrame* we can use `dataFrame['col_name']` which will give us a *Series* which is a 1d-array of the values of the column in addition to the row-labels 
+ - another way is to "select" one or more columns and return a new *DataFrame* with just those columns, we do so using `dataFrame[['col1','col2',...]]`
+ - if we use `dataFrame[index]` we can access rows at `index`, we can also use intervals just like a list, this gives us a new *DataFrame* that contain only the selected rows
+ - a versatile way to access data in a *DataFrame* is to use the methods `loc` and `iloc`
+	 - `dataFrame.loc['row_name']` will give us a *Series* containing the data of the specified role
+	 - `dataFrame.loc[['row1','row2',...],['col1','col2',...]]` we can select one or more rows and columns using this syntax, in order to only select columns and leave all the rows in we can use `dataFrame.loc[:,['col1',...]]`, similarly, if we only specify the rows list we get all columns of each row (if it's a single column or row we can omit the `[]` and just write `['row',['col1',...]]` Note that this will return a *Series* and not a *DataFrame*)
+	 - `iloc` method works just like `loc` but instead of using row and column labels we use their indexes instead treating the *DataFrame* as if it's a 2d-array, we can use `[index]` to select a single row as a series or `[[index_row,...],[index_col,...]]` to select multiple rows and columns, same rules apply with the benefit of being able to use intervals to select either rows or columns
+ - we can create bool *Series* from a regular *Series* by using comparison operators `bool_series = dataFrame['col_name'] < 10` after that we can use the result to select rows that correspond to values of `'col_name'` that satisfy the condition by writing `dataFrame[bool_series]`
+ Note that `np.logical_and` , `logical_or` and `logical_not` work on Boolean *Series* as well 
 
  
