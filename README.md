@@ -87,6 +87,12 @@ this coverts `list` into a numpy array called `np_array`
 	 
  - `np.corrcoef(x,y)` returns the [correlation coefficient](https://www.investopedia.com/ask/answers/032515/what-does-it-mean-if-correlation-coefficient-positive-negative-or-zero.asp) of the dataset, simmilarly `np.cov` is used to calculate the [covariance](https://www.investopedia.com/terms/c/covariance.asp) 
  - `np.logical_and`, `np.logical_or` and `np.logical_not` can be used to perform element wise Boolean operations on two bool arrays
+#### numpy.random
+ - `np.random.seed(seed)` here seed is an integer that the package uses to generate random numbers, if not specified a random seed is selected
+ - `np.random.rand()` gives us a pseudo-random float between 0 and 1
+ - `np.random.randint(inf, sup)` generates an integer inside the half-open interval `[inf, sup[`
+ - 
+
 ### Matplotlib
 
 > matplotlib. pyplot is a collection of functions that make matplotlib
@@ -149,5 +155,32 @@ if the file contains row labels we need to tell this function what's the index o
 	 - `iloc` method works just like `loc` but instead of using row and column labels we use their indexes instead treating the *DataFrame* as if it's a 2d-array, we can use `[index]` to select a single row as a series or `[[index_row,...],[index_col,...]]` to select multiple rows and columns, same rules apply with the benefit of being able to use intervals to select either rows or columns
  - we can create bool *Series* from a regular *Series* by using comparison operators `bool_series = dataFrame['col_name'] < 10` after that we can use the result to select rows that correspond to values of `'col_name'` that satisfy the condition by writing `dataFrame[bool_series]`
  Note that `np.logical_and` , `logical_or` and `logical_not` work on Boolean *Series* as well 
-
+ #### Inspecting DataFrames
  
+ - `df.head()` return the first few rows of `df`
+ - `df.info()` returns info about each column like dataType and number of missing values
+ - `df.describe()` returns statistics for each column if possible
+ - `df.shape()` returns the dimensions of `df`
+ - `df.values` contains a numpy 2d array that contains the values
+ -  `df.columns` contains the list of column names
+ - `df.index` contains the list of either numeric row indexes or row-labels
+#### Data manipulation
+ - `df.sort_values('col_name',ascending=True)` sorts *DataFrame* on `'col_name`
+ - `df.sort_values(['col1',...], ascending=[True,...])` sorts *DataFrame* based on multiple columns
+ - we can filter with multiple conditions by using `&` and `|` operators `df[(df["col1"] > 60) & (dogs["col2"] == "test")]` which will result in a bool array (the parentheses are required)
+ - `df['col_name'].isin(['val1',...])` filter by values that are equal to one of the elements of the list
+ - `df['col_name'] = def['col'] ** 2` just like numpy arrays we can assign columns the result of arithmetic operations done on the same or other columns, this can also be used to create new columns
+ - we can calculate statistical data of columns by calling the following methods `df.mean(); df.mode(); df.min(); df.max(); df.var(); df.std(); df.sum(); df.quantile();`some methods have a cummulative version by adding the prefix cum `cumsum()` for example
+ - `df['col'].agg(aggFunction)` aggregate functions act on the whole column and return a value usually a statistical value, aggregate functions can act on multiple columns and multiple functions can be called each resulting in a function `def[['col1',...]].agg([aggFun1, ...])`
+ - `df.drop_duplicates(subset='col_name')` remove rows with duplicate occurrences in `col_name`, you can assign a list of column names to subset too
+ - `df['col'].values_counts(sort=False, normalize=False, ascending=True)` returns the number of occurrences of each value in the column
+	 - works on *Series* aka single columns only
+	 - if `normalize` is set to true, number of occurrences will be  divided by the total number of elements giving us the ration of each unique element in the column
+ - `df.groupby('col-name')[['col1',...]].sum()`groups the unique values of `col_name` and apply a function over the values `sum` for example, selecting columns is optional
+ - `df.groupby('col-name').agg([sum, min, max, np.mean])` we use this to  get multiple statistics about each group
+ - `df.pivot_table(values='new-col', index='col1',columns='col2', aggfunc=np.mean, margins=False)` the pivot table method can do what groupby does and more
+	 - `values` can be a string or a list of strings that would be used as column names if the parameter `columns` is not specified
+	 - `index` the column to do the "group by" on
+	 - `aggfunc`a function or a list of functions, by default `pivot_table` calculates means
+	 - `columns` use the values of a column as column names, which results in the values of the `index` column acting as row-labels and the values of `columns` column acting as column-labels
+	 - `margins` if margins is set to true, a row and a column called 'All' is added and it shows the statistics applied to each column and row respectively 
