@@ -178,9 +178,10 @@ if the file contains row labels we need to tell this function what's the index o
 	 - if `normalize` is set to true, number of occurrences will be  divided by the total number of elements giving us the ration of each unique element in the column
  - `df.groupby('col-name')[['col1',...]].sum()`groups the unique values of `col_name` and apply a function over the values `sum` for example, selecting columns is optional
  - `df.groupby('col-name').agg([sum, min, max, np.mean])` we use this to  get multiple statistics about each group
- - `df.pivot_table(values='new-col', index='col1',columns='col2', aggfunc=np.mean, margins=False)` the pivot table method can do what groupby does and more
-	 - `values` can be a string or a list of strings that would be used as column names if the parameter `columns` is not specified
-	 - `index` the column to do the "group by" on
+ - `df.pivot_table(values='new-col', index='col1',columns='col2', aggfunc=np.mean, margins=False, fill_value=0)` the pivot table method can do what groupby does and more
+	 - `values` column that agg function is going to use
+	 - `index` the column that is going to be grouped and used as row-labels
+	 - `columns` the column that is going to be grouped and used as column-labels
 	 - `aggfunc`a function or a list of functions, by default `pivot_table` calculates means
-	 - `columns` use the values of a column as column names, which results in the values of the `index` column acting as row-labels and the values of `columns` column acting as column-labels
 	 - `margins` if margins is set to true, a row and a column called 'All' is added and it shows the statistics applied to each column and row respectively 
+	 - `fill_value` if specified, set the missing data to the value of `fill_value`
