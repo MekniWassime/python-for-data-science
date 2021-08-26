@@ -113,12 +113,15 @@ in order to use this package we need to import it like so
 	 - `s` is assigned a list that controls the size of each dot in the graph
 	 - `c` is a list of colors that controls the color of each dot in the graph
 	 - `alpha` is the alpha of each dot (value from 0 to 1)
+ - if u build multiple plots before `show()` they will be superimposed, use `plt.legend(['F','M','O'])` to add a legend that shows the viewer what each color corresponds to
+
 ##### graph customizations
  - `plt.xlabel(label)` add a label on the x-axis (resp y-axis)
  - `plt.title(title)` add a title to the graph
  - `plt.xticks(tick_val, tick_lab)` customize ticks of the x-axis, `tick_val` and `tick_lab` are lists containing the values of ticks and the labels of each tick respectively
  - `plt.text(x,y,text)` shows text on the graph on the point `(x,y)`
  - `plt.grid(True)` enables grid
+ 
 
 ### Pandas
 
@@ -134,8 +137,10 @@ in order to use this package we need to import it like so
 
 One way to build a *DataFrame* is from a dictionary where the keys represent column names and the values are lists of the corresponding data
 
-    dict = {'cities':[...],'population':[...]}
-    dataFrame = pd.DataFrame(dict)
+    dict-of-lists = {'city':[...],'population':[...]}
+    list-of-dicts = [{'city':'val','population':'val'},...]
+    dataFrame = pd.DataFrame(dict-of-lists)
+    dataFrame = pd.DataFrame(list-of-dicts)
 
   by default *DataFrame* labels are indexed 0, 1, 2 ... and so on, we can change this by passing a list of labels to the `dataFrame.index = labels` property
   
@@ -146,12 +151,14 @@ if the file contains row labels we need to tell this function what's the index o
 
     dataFrame = pd.read_csv('file-path', index_col = 0)
 
+ - to export *DataFrame* as a csv file `df.to_csv('file.csv')`
+
  - to access data from a *DataFrame* we can use `dataFrame['col_name']` which will give us a *Series* which is a 1d-array of the values of the column in addition to the row-labels 
  - another way is to "select" one or more columns and return a new *DataFrame* with just those columns, we do so using `dataFrame[['col1','col2',...]]`
  - if we use `dataFrame[index]` we can access rows at `index`, we can also use intervals just like a list, this gives us a new *DataFrame* that contain only the selected rows
  - a versatile way to access data in a *DataFrame* is to use the methods `loc` and `iloc`
 	 - `dataFrame.loc['row_name']` will give us a *Series* containing the data of the specified role
-	 - `dataFrame.loc[['row1','row2',...],['col1','col2',...]]` we can select one or more rows and columns using this syntax, in order to only select columns and leave all the rows in we can use `dataFrame.loc[:,['col1',...]]`, similarly, if we only specify the rows list we get all columns of each row (if it's a single column or row we can omit the `[]` and just write `['row',['col1',...]]` Note that this will return a *Series* and not a *DataFrame*)
+	 - `dataFrame.loc[['row1','row2',...],['col1','col2',...]]` we can select one or more rows and columns using this syntax, in order to only select columns and leave all the rows in we can use `dataFrame.loc[:,['col1',...]]`, similarly, if we only specify the rows list we get all columns of each row (if it's a single column or row we can omit the `[]` and just write `['row',['col1',...]]` Note that this will return a *Series* and not a *DataFrame*), if we would like to use `:` for ranges we don't use the inner `[ ]` like so `dataframe.loc[:,'col1':'col3]` (will include `'col1'`, `'col2'` and everything in between)
 	 - `iloc` method works just like `loc` but instead of using row and column labels we use their indexes instead treating the *DataFrame* as if it's a 2d-array, we can use `[index]` to select a single row as a series or `[[index_row,...],[index_col,...]]` to select multiple rows and columns, same rules apply with the benefit of being able to use intervals to select either rows or columns
  - we can create bool *Series* from a regular *Series* by using comparison operators `bool_series = dataFrame['col_name'] < 10` after that we can use the result to select rows that correspond to values of `'col_name'` that satisfy the condition by writing `dataFrame[bool_series]`
  Note that `np.logical_and` , `logical_or` and `logical_not` work on Boolean *Series* as well 
@@ -170,7 +177,7 @@ if the file contains row labels we need to tell this function what's the index o
  - we can filter with multiple conditions by using `&` and `|` operators `df[(df["col1"] > 60) & (dogs["col2"] == "test")]` which will result in a bool array (the parentheses are required)
  - `df['col_name'].isin(['val1',...])` filter by values that are equal to one of the elements of the list
  - `df['col_name'] = def['col'] ** 2` just like numpy arrays we can assign columns the result of arithmetic operations done on the same or other columns, this can also be used to create new columns
- - we can calculate statistical data of columns by calling the following methods `df.mean(); df.mode(); df.min(); df.max(); df.var(); df.std(); df.sum(); df.quantile();`some methods have a cummulative version by adding the prefix cum `cumsum()` for example
+ - we can calculate statistical data of columns by calling the following methods `df.mean(); df.mode(); df.min(); df.max(); df.var(); df.std(); df.sum(); df.quantile();`some methods have a cumulative version by adding the prefix cum `cumsum()` for example, all these methods take an argument `axis` that is set to `"index"` by default, if set to `"columns"` these calculations will be based on each row values which means they can be used only if all columns have the same dataType (True in the case of a pivot_table)
  - `df['col'].agg(aggFunction)` aggregate functions act on the whole column and return a value usually a statistical value, aggregate functions can act on multiple columns and multiple functions can be called each resulting in a function `def[['col1',...]].agg([aggFun1, ...])`
  - `df.drop_duplicates(subset='col_name')` remove rows with duplicate occurrences in `col_name`, you can assign a list of column names to subset too
  - `df['col'].values_counts(sort=False, normalize=False, ascending=True)` returns the number of occurrences of each value in the column
@@ -185,3 +192,28 @@ if the file contains row labels we need to tell this function what's the index o
 	 - `aggfunc`a function or a list of functions, by default `pivot_table` calculates means
 	 - `margins` if margins is set to true, a row and a column called 'All' is added and it shows the statistics applied to each column and row respectively 
 	 - `fill_value` if specified, set the missing data to the value of `fill_value`
+ - we can access rows in a *DataFrame* by `df.loc['value']` specifying the value or list of values we want to select rows by, indexes also allow us to select ranges of values `df.loc['date1':'date2']` if `df` is sorted by index then we will get all rows with date values in between and including `date1` and `date2` (dates have to be in ISO 8601 format, that is, `yyyy-mm-dd`, partial dates are also supported like `yyyy-mm` and `yyyy`)
+	 - `df.set_index('col-name')` set column as index or list of indexes (in hierarchical order) 
+	 - `df.reset_index(drop=False)` resets the index to default, if `drop` is True it deletes the columns that were considered an index
+	 - if multiple columns are set as index, we can select by a single index column but it needs to have the highest order in the hierarchy, if we want to select by a subset of the index columns, every specified index column needs all of it's "parents" in the hierarchy present `df.loc[(ind1, ind2, ...),(ind1,...)]`
+	 - we can sort by index using `df.sort_index(level=['col',...],ascending=[True,...])` if we omit `level` it will sort on all indexes
+	 - `df['date'].dt.year` to access the year value of the date string, we can also access `month` and `day`
+#### missing values
+
+ - `df.isna()` returns a *DataFrame* with boolean values that are set to True if the value is `NaN` we can call `.sum()` on it to find the number of `NaN`s per column or `.any()` to see which columns have `NaN`s
+ - `df.dropna()` delete all rows that have `NaN`s
+ - `df.fillna(value)` set all `NaN`s to `value` 
+
+#### visualizing DataFrames
+ - `df.hist()` will draw a histogram for each column, it takes the following parameters:
+	 - `column` a string or list of strings of columns that you want to plot
+	 -  `grid` bool default is true
+	 - `bins` default 10
+	 - `legend` bool default false
+	 - `alpha` float from 0 to 1
+ - `df.plot()`draw a variety of graph types based on arguments
+	 - `kind` string that specifies the kind of graph `"line"`, `"bar"` , `"scatter"` etc
+	 - `grid` bool default is true
+	 - `x` column to be used on the x-axis
+	 - `y` column to be used on y-axis
+	 - `xlabel` and `ylabel` and `title` are strings
