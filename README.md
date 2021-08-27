@@ -157,7 +157,8 @@ if the file contains row labels we need to tell this function what's the index o
     dataFrame = pd.read_csv('file-path', index_col = 0)
   
 
- - `index_col` could also be a list of strings or integers 
+ - `index_col` could also be a list of strings or integers
+ - `parse_dates` bool or list of integers or strings, if bool and true it will try to parse the index, if list of integers or strings it will try to parse the corresponding columns 
 
  - to export *DataFrame* as a csv file `df.to_csv('file.csv')`
 
