@@ -1,4 +1,9 @@
 # Python Cheat Sheet
+### Syntax
+
+    city \
+	.get_capital()
+we can use `\` to tell the compiler that these two lines of code are a single line so that it doesn't throw a syntax error
 ### Lists
 lists in python are reference types which means that the following
 
@@ -150,6 +155,9 @@ One way to build a *DataFrame* is from a dictionary where the keys represent col
 if the file contains row labels we need to tell this function what's the index of that column, if it's the first column we set `index_col` to `0`
 
     dataFrame = pd.read_csv('file-path', index_col = 0)
+  
+
+ - `index_col` could also be a list of strings or integers 
 
  - to export *DataFrame* as a csv file `df.to_csv('file.csv')`
 
@@ -217,3 +225,28 @@ if the file contains row labels we need to tell this function what's the index o
 	 - `x` column to be used on the x-axis
 	 - `y` column to be used on y-axis
 	 - `xlabel` and `ylabel` and `title` are strings
+####  merging DataFrames
+ - `df1.merge(df2, on='col', suffixes=('_s1','_s2'), how='inner')`
+	 - `on` the column or columns to join both tables on
+	 - `suffixes` by default the duplicate column names suffixes is `('_x', '_y')`
+	 - `how` could be `‘left’`, `‘right’`, `‘outer’` or `‘inner’`, `‘cross’`, default is `‘inner’`
+	 - instead of `on` we can use `left_on` and `right_on` if the the columns to merge on have different names on each table
+	 - `indicator` Boolean if set to True it will add a new column `'_merge'` to the resulting table 
+	 - `validate` defaults to none can take `one_to_one`, `one_to_many`, `many_to_one` or `many_to_many`. If this property is set the method might throw a `MergeError` if the join is not of the specified type
+ - `pd.concat([df1,...], )` concatenate a list of *DataFrames*
+	 - `ignore_index` bool defaults to false, if set to true index will be reset and it will start from 0 to the length of the resulting table -1
+	 - `keys` list of strings, can't be used with `ignore_index`, resulting in multi-index table with both the keys and original indexes present
+	 - `join` defaults to `outer`, could be set to `inner` so that only common columns will be included
+	 - `sort` if true columns are sorted, has no effect if `join='inner'`
+	 - we can also use `df1.append([df2,...])` with some of differences being that they don't accept `keys` and `join` parameters, `join` is always `outer`
+ - `pd.merge_ordered(df1, df2)` the result of this merge is sorted by the column it's joined on, `how` is by default set to `'outer'`
+	 - `fill_method` if set to `'ffill'` missing data will be filled using the value before it, if the first value is `NaN` it will stay as there are no preceding values
+ - `pd.merge_asof(df1, df2)` perform a merge similar to a left join but keys from the left table are matched with the closest value instead of an exact match, keys from both tables need to be sorted
+	 - `direction` set to `'backwards'` by default, could be set to `forwards` or `'nearest'`
+		 - `backwards` left key is matched to the closest key on right that is smaller or equal to it
+		 - `forwards` same as backwards but greater or equal
+		 - `nearest` find the closest key, could be smaller, greater or equal
+ - `df.query('sql like conditions')` and example of the sql like condition is `'col1=="str1" or (col2 < 9 and col1=="str2")'`
+ - `df.melt()` melt groups multiple columns into two columns ,`'variable'`containing columns names and `'value'`that contains the values that were contained in the column
+	 - `id_vars` list of columns to not melt
+ - `pd.to_datetime(arg, utc=None)` convert arg into a *DateTime* object, `utc` is a boolean
