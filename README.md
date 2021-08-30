@@ -44,7 +44,7 @@ in python Boolean operators are `and`, `or` and `not`
     else :                            	expression
 	    expression                    
 #### for loop
- - to iterate over a list with the index value we can use `for index, var in enumerate(seq)`
+ - to iterate over a list with the index value we can use `for index, var in enumerate(seq)`, by default index starts from `0` but we can chage this by passing the `start` parameter to the enumerate function 
  - you can also use the `,` separated variables to access elements of an array of arrays where `var1, var2` would correspond to `var1=element[0]` and `var2=element[1]`
  - to iterate over a dictionary we use `for key, value in dict.items():`
  - to iterate over a 2d numpy array we could use `for elem in 2d_array:` but the value of `elem` would contain 1d arrays, in order to iterate over the elements of a nd-array element by element we could use the following `for elem in np.nditer(nd_array)`
@@ -61,7 +61,85 @@ in python Boolean operators are `and`, `or` and `not`
  - `dict[key]` to access the value corresponding to the key
  - `key in dict` returns true if key is in the dictionary
  - `del(dict[key])` deletes the key from the dictionary 
+### Functions
 
+    def function_name(params):
+	    """ documentation string """
+	    #function body
+	    return value
+Global scope variables are available inside functions but in order to modify their values we need to use the `global` keyword
+
+    x = 5
+    def function_name(parames):
+	    global x
+	    x = 10
+
+when accessing a variable or a function scopes are searched in the following order
+ - Local scope
+ - Enclosing functions
+ - Global
+ - Built-in
+
+functions can also be defined locally inside other functions
+
+    def outer(x):
+	    def inner(y):
+		    return x*y
+		return inner
+here we returned the `inner` function but we didn't call it rather we returned it's definition that's dependent on the x parameter of `outer`
+
+    funcvar = outer(5)
+    z = funcvar(2) #z = 5 * 2 = 10
+in order to modify the local variables of `outer` inside `inner` we need to use `nonlocal` keyword just like the global keyword
+
+	 def outer():
+		x = 5
+	    def inner(y):
+		    nonlocal x
+		    x = y
+#### Default arguments, *args and **kwargs
+
+    def func(arg1, arg2='default'): ...
+    func(arg2='val2',arg1='val1')
+all arguments can be called either as positional or named arguments if they can be resolved into a valid function call
+
+    def func(*args): ...
+`args` can be called any other name what matters is the `*`, this definition allows us to pass a varying number of parameters which will be transformed into a *Tuple* 
+
+    def func(**kwargs): ...   
+`kwargs` can also be given any name you want, here the arguments passed to the function are key value pairs which are then transformed into a *Dictionary*
+
+    lambda-func = lambda x, y: x + y
+    lambda-func(2,5) # 7
+#### Exceptions
+
+    try:
+	    expression
+	except: ExceptionType1
+		handle1
+	except:
+		handle2
+		
+	raise ErrorType('message')
+[List of built in error types](https://www.programiz.com/python-programming/exceptions) 
+#### Iterators and lists
+`iter(iterable)` to create an iterator on the iterable
+`next(iterator)` get the next item of iterator
+
+ - `functools.reduce(func, seq)` reduce a list to a single value an example would be the `sum` function, `func` a function that takes two parameters and returns a single value, `seq` the sequence to reduce
+ - `filter(func, seq)` filter a list based on the Boolean returned by `func` for each element, `func` takes one parameter and returns a Boolean
+ - `map(func, seq)` transform elements of `seq` into another value, `func` takes one parameter and returns the transformed element, this returns a *map* which we could turn into a list using the `list()` function
+ - `zip(list1, list2, ...)` if given two lists it produces a list of tuples where the first element of each tuple comes from the first list and the second comes from the second list, same principle for more than two lists , this returns a *zip* that we can transform into a list using `list()`
+
+unpacking operator `*` is used to separate or unpack iterables into single items, `[1, *[2, 3, 4]]` would result in `[1, 2, 3, 4]` or when calling functions `func(*[1, 2])` is equivalent to `func(1, 2)`
+ 
+### Tuples
+
+    new_tuple = (1, 2, 3)
+    a, b, c = new_tuple
+    val = new_tuple[0]
+  Unlike lists, tuples are immutable but they are iterable
+  
 ### Packages
 `ìmport math as mt` import package `math` under the alias `mt`
 `from math import pi as pie` import `pi` from `math` under the alias `pie` *(specifying an alias is optional in both cases)*
@@ -152,6 +230,10 @@ One way to build a *DataFrame* is from a dictionary where the keys represent col
   We can also build a *DataFrame* from a CSV (comma seperated values) file like so
 
     dataFrame = pd.read_csv('file-path')
+we could read data from a large file in chunks, the following syntax will give us an iterator that we could use to do our operations chunk per chunk in a for loop (`chunksize` designates the number of rows per chunk)
+
+    for chunk in pd.read_csv('path', chunksize=10)
+
 if the file contains row labels we need to tell this function what's the index of that column, if it's the first column we set `index_col` to `0`
 
     dataFrame = pd.read_csv('file-path', index_col = 0)
